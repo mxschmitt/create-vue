@@ -41,9 +41,13 @@ function renderTemplate(src, dest) {
     return
   }
 
-  if (filename.startsWith('_')) {
-    // rename `_file` to `.file`
-    dest = path.resolve(path.dirname(dest), filename.replace(/^_/, '.'))
+  if (filename === '.gitignore') {
+    // merge instead of overwriting
+    let existing = fs.existsSync(dest) ? fs.readFileSync(dest).toString() : ''
+    if (existing.length > 0 && existing[existing.length - 1] !== '\n') existing += '\n'
+    existing += fs.readFileSync(src).toString()
+    fs.writeFileSync(dest, existing)
+    return
   }
 
   fs.copyFileSync(src, dest)
